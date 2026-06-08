@@ -1,0 +1,43 @@
+#pragma kernel CSMain
+
+Texture3D<float4> InputTexture;
+RWTexture3D<float4> OutputTexture;
+int Resolution;
+
+[numthreads(8,8,8)]
+void CSMain(uint3 id : SV_DispatchThreadID) {
+    if (Resolution < 0)
+        return;
+    uint resolution = Resolution;
+    if (any(id >= resolution))
+        return;
+    
+    float weights[4] = { 0.124, 0.0568, 0.026, 0.012 };
+    // 0 - center
+    // 1 - face niehgbors (center of each face)
+    // 2 - edge neighbors (center of each edge)
+    // 3 - corner neighbors
+
+    float sum = 0.0;
+    float weight_sum = 0.0;
+
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            for (int z = -1; z <= 1; z++) {
+                int3 pos = id + int3(x, y, z);
+                if (all(pos) < 0 || all(pos >= Resolution))
+                    continue;
+                
+                int weight_type = abs(x) + abs(y) + abs(z);
+                
+                float weight = weights[weight_type];
+                float sample_value = InputTexture[pos].r;
+                sum += sample_value * weight;
+                weight_sum += weight;
+            }
+        }
+    }
+
+    float result = sum / weight_sum;
+    OutputTexture[id] = float4(result, 0, 0, 1);
+}
