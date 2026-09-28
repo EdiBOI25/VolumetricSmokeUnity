@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using VoxelSystem;
 
+// Derived from GPUVoxelizer.cs (mattatz/unity-voxel, MIT License, Copyright (c) 2018 mattatz)
+// https://github.com/mattatz/unity-voxel
+// See VolumetricSmoke/Packages/Voxelizer/LICENSE
+
 namespace VolumetricSmoke
 {
     public class OptimizedGPUVoxelizer
